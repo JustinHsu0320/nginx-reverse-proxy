@@ -1,0 +1,2 @@
+.env
+reverse_proxy/nginx.conf

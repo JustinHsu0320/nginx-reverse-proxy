@@ -1,0 +1,44 @@
+user www-data;
+worker_processes auto;
+pid /run/nginx.pid;
+include /etc/nginx/modules-enabled/*.conf;
+
+events {
+	worker_connections 1024;
+}
+
+http {
+    # Reverse Proxy
+    server {
+        listen 80;
+        server_name localhost 127.0.0.1;
+
+        # 1. All docker containers which will be exposed by reverse proxy must be in the same network.
+
+        # 2. Demo:
+        # location /<expose-project-path> {
+        #     proxy_pass          http://<container-name>:<internal-port>;
+        #     proxy_set_header    X-Forwarded-For $remote_addr;
+        # }
+
+        location / {
+            proxy_pass          http://portal:80/;
+            proxy_set_header    X-Forwarded-For $remote_addr;
+        }
+
+        location /operator-user-module {
+            proxy_pass          http://operator_user_module:80/;
+            proxy_set_header    X-Forwarded-For $remote_addr;
+        }
+
+        location /ip-location {
+            proxy_pass          http://ip_location_module_php:80/;
+            proxy_set_header    X-Forwarded-For $remote_addr;
+        }
+
+        location /crt-key {
+            proxy_pass          http://crt-key-ansible-ctl:80/;
+            proxy_set_header    X-Forwarded-For $remote_addr;
+        }
+    }
+}
