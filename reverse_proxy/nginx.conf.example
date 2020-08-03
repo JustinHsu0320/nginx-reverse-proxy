@@ -16,8 +16,8 @@ http {
         # 1. All docker containers which will be exposed by reverse proxy must be in the same network.
 
         # 2. Demo:
-        # location /<expose-project-path> {
-        #     proxy_pass          http://<container-name>:<internal-port>;
+        # location /<expose-project-path>/ {
+        #     proxy_pass          http://<container-name>:<internal-port>/;
         #     proxy_set_header    X-Forwarded-For $remote_addr;
         # }
 
@@ -26,17 +26,17 @@ http {
             proxy_set_header    X-Forwarded-For $remote_addr;
         }
 
-        location /operator-user-module {
+        location /operator-user-module/ {
             proxy_pass          http://operator_user_module:80/;
             proxy_set_header    X-Forwarded-For $remote_addr;
         }
 
-        location /ip-location {
+        location /ip-location/ {
             proxy_pass          http://ip_location_module_php:80/;
             proxy_set_header    X-Forwarded-For $remote_addr;
         }
 
-        location /crt-key {
+        location /crt-key/ {
             proxy_pass          http://crt-key-ansible-ctl:80/;
             proxy_set_header    X-Forwarded-For $remote_addr;
         }
