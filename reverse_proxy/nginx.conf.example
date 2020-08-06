@@ -4,7 +4,7 @@ pid /run/nginx.pid;
 include /etc/nginx/modules-enabled/*.conf;
 
 events {
-	worker_connections 1024;
+        worker_connections 1024;
 }
 
 http {
@@ -13,9 +13,9 @@ http {
         listen 80;
         server_name localhost 127.0.0.1;
 
-        # 1. All docker containers which will be exposed by reverse proxy must be in the same network.
+        # 1. All docker containers must be in the same network.
 
-        # 2. Demo:
+        # 2. Document:
         # location /<expose-project-path>/ {
         #     proxy_pass          http://<container-name>:<internal-port>/;
         #     proxy_set_header    X-Forwarded-For $remote_addr;
@@ -29,6 +29,11 @@ http {
         location /operator-user-module/ {
             proxy_pass          http://operator_user_module:80/;
             proxy_set_header    X-Forwarded-For $remote_addr;
+            # 延長代理逾期
+            proxy_connect_timeout       600;
+            proxy_send_timeout          600;
+            proxy_read_timeout          600;
+            send_timeout                600;
         }
 
         location /ip-location/ {
@@ -40,5 +45,20 @@ http {
             proxy_pass          http://crt-key-ansible-ctl:80/;
             proxy_set_header    X-Forwarded-For $remote_addr;
         }
+
+        # Websocket (bin file)
+        location /octopus-ping/  {
+            proxy_pass http://0.0.0.0:8888/octopus-ping;
+
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+
+            proxy_set_header Host $http_host;
+            proxy_set_header X-NginX-Proxy true;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+
     }
 }
